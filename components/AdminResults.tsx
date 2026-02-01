@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { TestResult } from '../types';
+import { TestResult } from '../types.ts';
 
 interface AdminResultsProps {
   results: TestResult[];
@@ -22,9 +22,8 @@ const AdminResults: React.FC<AdminResultsProps> = ({ results, onBack }) => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // Add Title
       doc.setFontSize(20);
-      doc.setTextColor(79, 70, 229); // Indigo 600
+      doc.setTextColor(79, 70, 229);
       doc.text("TEST GDPI - Natijalar Hisoboti", 14, 20);
       
       doc.setFontSize(10);
@@ -140,4 +139,49 @@ const AdminResults: React.FC<AdminResultsProps> = ({ results, onBack }) => {
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(result.date).toLocaleDateString()}<br/>
                       <span className="text-[10px] uppercase font-bold text-gray-300">
-                        {new Date(result.date).toLocaleTimeString([], { hour: '2-digit',
+                        {new Date(result.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-gray-900">{result.studentName}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-indigo-600">{result.group}</td>
+                    <td className="px-6 py-4 text-sm text-gray-700">{result.subjectName}</td>
+                    <td className="px-6 py-4">
+                      <span className="font-bold text-gray-900">{result.score}</span>
+                      <span className="text-gray-400 text-xs"> / {result.total}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-black ${colorClass}`}>
+                        {Math.round(percentage)}%
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredResults.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-400 italic">
+                    Ma'lumot topilmadi
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <style>{`
+        @media print {
+          .no-print { display: none !important; }
+          body { background: white !important; }
+          .bg-gray-50 { background: white !important; }
+          .rounded-3xl { border-radius: 0 !important; }
+          .shadow-xl { box-shadow: none !important; }
+          table { width: 100% !important; border-collapse: collapse !important; }
+          th, td { border: 1px solid #eee !important; padding: 10px !important; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default AdminResults;

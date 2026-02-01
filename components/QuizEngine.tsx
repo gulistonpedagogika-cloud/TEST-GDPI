@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Subject, Question, TestResult } from '../types';
+import { Subject, Question, TestResult } from '../types.ts';
 
 interface QuizEngineProps {
   subject: Subject;
@@ -16,22 +16,17 @@ const QuizEngine: React.FC<QuizEngineProps> = ({ subject, student, onComplete, o
   const [timeLeft, setTimeLeft] = useState(subject.settings.timeLimitMinutes * 60);
   const [isFinished, setIsFinished] = useState(false);
 
-  // Randomize questions from base and randomize their options
   useEffect(() => {
-    // 1. Pick N random questions from the total pool
     const selectedQuestions = [...subject.questions]
       .sort(() => Math.random() - 0.5)
       .slice(0, subject.settings.questionCount);
 
-    // 2. For each selected question, shuffle its options
     const fullyRandomized = selectedQuestions.map(q => {
-      // Create objects to track which one was originally index 0 (the correct one)
       const optionsWithMeta = q.options.map((text, originalIdx) => ({
         text,
         isCorrect: originalIdx === 0
       }));
 
-      // Shuffle options
       const shuffledOptions = optionsWithMeta.sort(() => Math.random() - 0.5);
 
       return {

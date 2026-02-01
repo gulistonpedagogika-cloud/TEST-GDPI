@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { AppView, Subject, TestResult } from './types';
-import { supabase } from './supabaseClient';
-import AdminPanel from './components/AdminPanel';
-import AdminResults from './components/AdminResults';
-import AdminLogin from './components/AdminLogin';
-import StudentLogin from './components/StudentLogin';
-import StudentSubjects from './components/StudentSubjects';
-import QuizEngine from './components/QuizEngine';
-import LandingPage from './components/LandingPage';
+import { AppView, Subject, TestResult } from './types.ts';
+import { supabase } from './supabaseClient.ts';
+import AdminPanel from './components/AdminPanel.tsx';
+import AdminResults from './components/AdminResults.tsx';
+import AdminLogin from './components/AdminLogin.tsx';
+import StudentLogin from './components/StudentLogin.tsx';
+import StudentSubjects from './components/StudentSubjects.tsx';
+import QuizEngine from './components/QuizEngine.tsx';
+import LandingPage from './components/LandingPage.tsx';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>(AppView.LANDING);

@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Subject, Question } from '../types';
+import { Subject, Question } from '../types.ts';
 
 declare const mammoth: any;
 
@@ -42,7 +42,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
         tables.forEach(table => {
           const rows = Array.from(table.querySelectorAll('tr'));
           
-          // Pattern 1: Horizontal Table (1 row = 1 question with 5+ columns)
           if (rows.length > 0 && rows[0].querySelectorAll('td').length >= 5) {
             rows.forEach((row, idx) => {
               const cols = Array.from(row.querySelectorAll('td')).map(td => td.innerText.trim());
@@ -56,7 +55,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
               }
             });
           } 
-          // Pattern 2: Vertical Table (5 rows = 1 question)
           else if (rows.length >= 5) {
             for (let i = 0; i < rows.length; i += 5) {
               if (i + 4 < rows.length) {
@@ -84,7 +82,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
           setPreviewQuestions(questionsList);
           setQuestionCount(Math.min(questionsList.length, 20));
         } else {
-          // Fallback text extraction if no tables
           const textResult = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
           const lines = textResult.value.split('\n').filter((l: string) => l.trim());
           const fallbackQs: Question[] = [];
