@@ -2,8 +2,10 @@
 export interface Question {
   id: string;
   text: string;
+  image?: string; // Savol rasmi (base64)
   options: string[];
-  correctIndex: number; // For your logic, 0 is always correct initially
+  optionImages?: (string | undefined)[]; // Har bir javob varianti uchun rasm (base64)
+  correctIndex: number;
 }
 
 export interface QuizSettings {

@@ -22,8 +22,10 @@ const QuizEngine: React.FC<QuizEngineProps> = ({ subject, student, onComplete, o
       .slice(0, subject.settings.questionCount);
 
     const fullyRandomized = selectedQuestions.map(q => {
+      // Shuffling options with their corresponding images
       const optionsWithMeta = q.options.map((text, originalIdx) => ({
         text,
+        image: q.optionImages ? q.optionImages[originalIdx] : undefined,
         isCorrect: originalIdx === 0
       }));
 
@@ -32,6 +34,7 @@ const QuizEngine: React.FC<QuizEngineProps> = ({ subject, student, onComplete, o
       return {
         ...q,
         options: shuffledOptions.map(o => o.text),
+        optionImages: shuffledOptions.map(o => o.image),
         correctIndex: shuffledOptions.findIndex(o => o.isCorrect)
       };
     });
@@ -75,7 +78,7 @@ const QuizEngine: React.FC<QuizEngineProps> = ({ subject, student, onComplete, o
   if (questions.length === 0) return (
     <div className="flex flex-col items-center justify-center h-96">
       <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-600 border-opacity-25 mb-4"></div>
-      <p className="text-gray-500 font-bold">Savollar yuklanmoqda...</p>
+      <p className="text-gray-500 font-bold text-center">Savollar va rasmlar tayyorlanmoqda...</p>
     </div>
   );
 
@@ -93,7 +96,7 @@ const QuizEngine: React.FC<QuizEngineProps> = ({ subject, student, onComplete, o
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-2">
+    <div className="max-w-4xl mx-auto py-2">
       <div className="flex justify-between items-center mb-4 px-4">
         <div>
           <h2 className="text-xl font-black text-gray-900 leading-tight">{subject.name}</h2>
@@ -117,45 +120,64 @@ const QuizEngine: React.FC<QuizEngineProps> = ({ subject, student, onComplete, o
         </div>
       </div>
 
-      <div className="bg-white p-6 md:p-8 rounded-[2rem] shadow-xl border border-gray-100 min-h-[400px] flex flex-col relative overflow-hidden">
+      <div className="bg-white p-6 md:p-8 rounded-[2rem] shadow-xl border border-gray-100 min-h-[450px] flex flex-col relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
         
         <div className="mb-8">
           <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase rounded-full mb-4 tracking-widest border border-indigo-100">
-            Savol Mazmuni
+            Savol
           </span>
-          <h3 className="text-xl md:text-2xl font-bold text-gray-800 leading-snug">
+          <h3 className="text-xl md:text-2xl font-bold text-gray-800 leading-snug mb-4">
             {currentQuestion.text}
           </h3>
+          {currentQuestion.image && (
+            <div className="flex justify-center mb-6 bg-gray-50 rounded-2xl p-4 border border-gray-100">
+              <img 
+                src={currentQuestion.image} 
+                alt="Savol rasmi" 
+                className="max-h-64 md:max-h-80 object-contain rounded-xl shadow-sm hover:scale-[1.02] transition-transform" 
+              />
+            </div>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 gap-3.5 flex-grow">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow">
           {currentQuestion.options.map((option, idx) => (
             <button 
               key={idx}
               onClick={() => handleSelect(idx)}
-              className={`group flex items-center p-4 rounded-2xl text-left transition-all duration-300 border-2 ${
+              className={`group flex flex-col items-center justify-center p-5 rounded-2xl text-center transition-all duration-300 border-2 ${
                 answers[currentQuestion.id] === idx 
-                ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg translate-y-[-1px]' 
+                ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg translate-y-[-2px]' 
                 : 'bg-white border-gray-100 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50/20'
               }`}
             >
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black mr-4 text-sm transition-colors flex-shrink-0 ${
-                answers[currentQuestion.id] === idx ? 'bg-white/20 text-white' : 'bg-gray-100 text-indigo-500'
-              }`}>
-                {String.fromCharCode(65 + idx)}
+              <div className="flex items-center w-full mb-2">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black mr-3 text-sm transition-colors flex-shrink-0 ${
+                  answers[currentQuestion.id] === idx ? 'bg-white/20 text-white' : 'bg-indigo-50 text-indigo-500'
+                }`}>
+                  {String.fromCharCode(65 + idx)}
+                </div>
+                <span className="text-base md:text-lg font-bold leading-tight flex-grow text-left">{option}</span>
+                {answers[currentQuestion.id] === idx && (
+                  <i className="fas fa-check-circle text-white text-lg"></i>
+                )}
               </div>
-              <span className="text-base md:text-lg font-semibold flex-grow leading-tight">{option}</span>
-              {answers[currentQuestion.id] === idx && (
-                <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center animate-in fade-in zoom-in ml-2">
-                  <i className="fas fa-check text-white text-xs"></i>
+              
+              {currentQuestion.optionImages && currentQuestion.optionImages[idx] && (
+                <div className="mt-2 w-full flex justify-center bg-white/10 rounded-xl p-2">
+                  <img 
+                    src={currentQuestion.optionImages[idx]} 
+                    alt={`Option ${idx}`} 
+                    className="max-h-32 object-contain rounded shadow-sm group-hover:scale-105 transition-transform" 
+                  />
                 </div>
               )}
             </button>
           ))}
         </div>
 
-        <div className="mt-10 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="mt-10 flex flex-col md:flex-row justify-between items-center gap-4 border-t border-gray-50 pt-6">
           <button 
             onClick={() => setCurrentIdx(Math.max(0, currentIdx - 1))}
             disabled={currentIdx === 0}
@@ -166,10 +188,10 @@ const QuizEngine: React.FC<QuizEngineProps> = ({ subject, student, onComplete, o
           
           <div className="flex gap-3 w-full md:w-auto">
             <button 
-              onClick={() => { if(confirm("Testni to'xtatmoqchimisiz?")) onCancel(); }}
+              onClick={() => { if(confirm("Testni bekor qilmoqchimisiz?")) onCancel(); }}
               className="px-5 py-3 text-red-500 font-bold text-sm hover:bg-red-50 rounded-xl transition-all"
             >
-              To'xtatish
+              Bekor qilish
             </button>
             
             {currentIdx === questions.length - 1 ? (
@@ -177,7 +199,7 @@ const QuizEngine: React.FC<QuizEngineProps> = ({ subject, student, onComplete, o
                 onClick={finishQuiz}
                 className="flex-grow md:flex-none px-8 py-3 bg-green-600 text-white font-black rounded-xl shadow-lg shadow-green-100 hover:bg-green-700 hover:scale-[1.01] transition-all flex items-center justify-center text-sm"
               >
-                YAKUNLASH <i className="fas fa-flag-checkered ml-2"></i>
+                TESTNI TUGATISH <i className="fas fa-flag-checkered ml-2"></i>
               </button>
             ) : (
               <button 
@@ -191,7 +213,7 @@ const QuizEngine: React.FC<QuizEngineProps> = ({ subject, student, onComplete, o
         </div>
       </div>
 
-      <div className="mt-8 flex flex-wrap justify-center gap-2 px-4">
+      <div className="mt-8 flex flex-wrap justify-center gap-2 px-4 mb-10">
         {questions.map((_, idx) => (
           <button
             key={idx}

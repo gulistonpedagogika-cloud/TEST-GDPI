@@ -20,6 +20,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const extractContent = (cell: Element) => {
+    const text = cell.textContent?.trim() || '';
+    const img = cell.querySelector('img');
+    const imageData = img ? img.getAttribute('src') : undefined;
+    return { text, image: imageData || undefined };
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -30,7 +37,19 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
     reader.onload = async (event) => {
       try {
         const arrayBuffer = event.target?.result as ArrayBuffer;
-        const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+        
+        // Mammoth options to handle images
+        const options = {
+          convertImage: mammoth.images.imgElement((image: any) => {
+            return image.read("base64").then((imageBuffer: any) => {
+              return {
+                src: "data:" + image.contentType + ";base64," + imageBuffer
+              };
+            });
+          })
+        };
+
+        const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer }, options);
         const html = result.value;
 
         const parser = new DOMParser();
@@ -42,62 +61,34 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
         tables.forEach(table => {
           const rows = Array.from(table.querySelectorAll('tr'));
           
-          if (rows.length > 0 && rows[0].querySelectorAll('td').length >= 5) {
+          if (rows.length > 0) {
             rows.forEach((row, idx) => {
-              const cols = Array.from(row.querySelectorAll('td')).map(td => td.innerText.trim());
-              if (cols[0] && cols.length >= 5) {
+              const cells = Array.from(row.querySelectorAll('td'));
+              if (cells.length >= 5) {
+                const qContent = extractContent(cells[0]);
+                const opt1 = extractContent(cells[1]);
+                const opt2 = extractContent(cells[2]);
+                const opt3 = extractContent(cells[3]);
+                const opt4 = extractContent(cells[4]);
+
                 questionsList.push({
                   id: `q-${idx}-${Date.now()}`,
-                  text: cols[0],
-                  options: cols.slice(1, 5),
+                  text: qContent.text,
+                  image: qContent.image,
+                  options: [opt1.text, opt2.text, opt3.text, opt4.text],
+                  optionImages: [opt1.image, opt2.image, opt3.image, opt4.image],
                   correctIndex: 0
                 });
               }
             });
-          } 
-          else if (rows.length >= 5) {
-            for (let i = 0; i < rows.length; i += 5) {
-              if (i + 4 < rows.length) {
-                const qText = rows[i].innerText.trim();
-                const options = [
-                  rows[i+1].innerText.trim(),
-                  rows[i+2].innerText.trim(),
-                  rows[i+3].innerText.trim(),
-                  rows[i+4].innerText.trim()
-                ];
-                if (qText && options[0]) {
-                  questionsList.push({
-                    id: `q-v-${i}-${Date.now()}`,
-                    text: qText,
-                    options: options,
-                    correctIndex: 0
-                  });
-                }
-              }
-            }
           }
         });
 
-        if (questionsList.length > 0) {
+        if (questionsList.length === 0) {
+          alert("Jadval ko'rinishidagi savollar topilmadi. Savollar Word jadvalining birinchi ustunida savol, qolgan 4 ta ustunida javoblar bo'lishi kerak.");
+        } else {
           setPreviewQuestions(questionsList);
           setQuestionCount(Math.min(questionsList.length, 20));
-        } else {
-          const textResult = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
-          const lines = textResult.value.split('\n').filter((l: string) => l.trim());
-          const fallbackQs: Question[] = [];
-          for (let i = 0; i < lines.length; i += 5) {
-            if (i + 4 < lines.length) {
-              fallbackQs.push({
-                id: `q-f-${i}-${Date.now()}`,
-                text: lines[i],
-                options: [lines[i+1], lines[i+2], lines[i+3], lines[i+4]],
-                correctIndex: 0
-              });
-            }
-          }
-          setPreviewQuestions(fallbackQs);
-          setQuestionCount(Math.min(fallbackQs.length, 20));
-          if (fallbackQs.length === 0) alert("Hech qanday test savollari topilmadi. Word fayl formatini tekshiring.");
         }
       } catch (error) {
         console.error("Faylni o'qishda xatolik:", error);
@@ -137,7 +128,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-black text-gray-900">Admin Paneli</h1>
-          <p className="text-gray-500">Test bazasini yaratish va boshqarish</p>
+          <p className="text-gray-500">Test bazasini yaratish (Rasmlar bilan)</p>
         </div>
         <div className="flex space-x-3">
           <button 
@@ -159,7 +150,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
         <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 mb-12 animate-in fade-in slide-in-from-top-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl font-bold flex items-center">
-              <i className="fas fa-upload text-indigo-500 mr-3"></i> Test Yuklash
+              <i className="fas fa-upload text-indigo-500 mr-3"></i> Worddan Import (Jadval usuli)
             </h2>
           </div>
           
@@ -172,7 +163,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
                   value={subjectName}
                   onChange={(e) => setSubjectName(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                  placeholder="Masalan: Informatika"
+                  placeholder="Masalan: Fizika"
                   required
                 />
               </div>
@@ -185,13 +176,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
                   {isProcessing ? (
                     <div className="flex items-center space-x-3">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
-                      <p className="text-indigo-600 font-bold">Fayl tahlil qilinmoqda...</p>
+                      <p className="text-indigo-600 font-bold">Rasmlar tahlil qilinmoqda...</p>
                     </div>
                   ) : (
                     <>
                       <i className="fas fa-file-word text-xl text-indigo-500 mr-3"></i>
                       <p className="text-indigo-900 font-bold">
-                        {previewQuestions.length > 0 ? `${previewQuestions.length} ta savol yuklandi` : "Word (.docx) yuklash"}
+                        {previewQuestions.length > 0 ? `${previewQuestions.length} ta savol yuklandi` : "Rasmli Word (.docx) tanlang"}
                       </p>
                     </>
                   )}
@@ -209,17 +200,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
             {previewQuestions.length > 0 && (
               <div className="animate-in fade-in slide-in-from-bottom-4">
                 <div className="bg-gray-50 p-6 rounded-2xl mb-8 border border-gray-100">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="text-lg font-bold text-gray-800">Test Sozlamalari</h3>
-                    <div className="text-sm font-bold text-indigo-600 bg-white px-3 py-1 rounded-full shadow-sm">
-                      Jami: {previewQuestions.length} ta savol
-                    </div>
-                  </div>
+                  <h3 className="text-lg font-bold text-gray-800 mb-6">Test Sozlamalari</h3>
                   <div className="grid md:grid-cols-2 gap-8">
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Talabaga nechta savol ko'rinsin?
-                      </label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Savollar soni</label>
                       <input 
                         type="number" 
                         value={questionCount}
@@ -229,7 +213,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
                         min="1"
                         required
                       />
-                      <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold">Savollar bazadan random tarzda tanlanadi</p>
                     </div>
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-2">Vaqt (daqiqa)</label>
@@ -246,15 +229,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
                 </div>
 
                 <div className="mb-8">
-                  <h3 className="text-lg font-bold text-gray-800 mb-4">Savollar Ko'rinishi (Preview)</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">Yuklangan savollar (Preview)</h3>
                   <div className="max-h-96 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
                     {previewQuestions.map((q, i) => (
                       <div key={i} className="p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-                        <p className="font-bold text-gray-900 mb-2"><span className="text-indigo-500 mr-2">{i+1}.</span>{q.text}</p>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col mb-2">
+                          <p className="font-bold text-gray-900"><span className="text-indigo-500 mr-2">{i+1}.</span>{q.text}</p>
+                          {q.image && <img src={q.image} alt="Question" className="mt-2 max-h-40 object-contain rounded-lg border border-gray-100" />}
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 mt-4">
                           {q.options.map((opt, idx) => (
-                            <div key={idx} className={`text-xs p-2 rounded-lg ${idx === 0 ? 'bg-green-50 text-green-700 border border-green-100 font-bold' : 'bg-gray-50 text-gray-500 border border-gray-100'}`}>
-                              {idx === 0 && <i className="fas fa-check-circle mr-1"></i>} {opt}
+                            <div key={idx} className={`text-xs p-3 rounded-lg flex flex-col items-center ${idx === 0 ? 'bg-green-50 text-green-700 border border-green-200 font-bold' : 'bg-gray-50 text-gray-500 border border-gray-200'}`}>
+                              <span className="mb-1">{opt}</span>
+                              {q.optionImages && q.optionImages[idx] && (
+                                <img src={q.optionImages[idx]} alt={`Opt ${idx}`} className="max-h-20 object-contain mt-1 rounded shadow-sm" />
+                              )}
                             </div>
                           ))}
                         </div>
@@ -268,7 +257,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
                     type="submit"
                     className="px-10 py-4 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 transition-all shadow-xl hover:shadow-indigo-300"
                   >
-                    Testni Baza Sifatida Saqlash
+                    Bazaga Saqlash
                   </button>
                 </div>
               </div>
@@ -281,7 +270,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ subjects, addSubject, deleteSub
         {subjects.length === 0 ? (
           <div className="col-span-full py-20 text-center bg-white rounded-[2.5rem] shadow-sm border border-gray-100">
             <i className="fas fa-folder-open text-gray-200 text-6xl mb-4"></i>
-            <p className="text-gray-400 font-medium">Hozircha fanlar bazasi mavjud emas</p>
+            <p className="text-gray-400 font-medium">Hozircha bazada testlar yo'q</p>
           </div>
         ) : (
           subjects.map(subject => (
