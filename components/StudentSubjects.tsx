@@ -10,47 +10,45 @@ interface StudentSubjectsProps {
 
 const StudentSubjects: React.FC<StudentSubjectsProps> = ({ subjects, onSelectSubject, studentName }) => {
   return (
-    <div className="max-w-5xl mx-auto">
-      <div className="mb-12">
-        <h2 className="text-3xl font-black text-gray-900 mb-2">Salom, {studentName.split(' ')[0]}! 👋</h2>
-        <p className="text-gray-500 text-lg">Bugun qaysi fan bo'yicha test topshirmoqchisiz?</p>
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-4">
+        <h2 className="text-base font-black text-gray-900 mb-0.5 uppercase tracking-tight">Salom, {studentName.split(' ')[0]}! 👋</h2>
+        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Fanni tanlang va boshlang</p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         {subjects.length === 0 ? (
-          <div className="col-span-full py-20 text-center">
-            <i className="fas fa-ghost text-6xl text-gray-200 mb-4"></i>
-            <p className="text-gray-400 text-xl font-medium">Hozircha faol testlar mavjud emas.</p>
+          <div className="col-span-full py-10 text-center bg-white rounded-xl border border-gray-50 shadow-sm">
+            <i className="fas fa-layer-group text-2xl text-gray-100 mb-2"></i>
+            <p className="text-gray-400 text-[10px] font-medium">Hali testlar yuklanmagan.</p>
           </div>
         ) : (
           subjects.map(subject => (
             <div 
               key={subject.id} 
               onClick={() => onSelectSubject(subject)}
-              className="group cursor-pointer bg-white p-8 rounded-[2rem] shadow-lg border border-gray-100 hover:border-indigo-500 hover:shadow-2xl transition-all relative overflow-hidden"
+              className="group cursor-pointer bg-white p-4 rounded-xl shadow-sm border border-gray-50 hover:border-indigo-400 hover:shadow transition-all relative overflow-hidden flex flex-col justify-between"
             >
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-50 rounded-full group-hover:scale-150 transition-transform duration-500 opacity-50"></div>
-              
-              <div className="relative z-10">
-                <div className="w-16 h-16 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-lg shadow-indigo-100">
-                  <i className="fas fa-book-open"></i>
+              <div>
+                <div className="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center text-xs mb-3 shadow-sm">
+                  <i className="fas fa-file-alt"></i>
                 </div>
-                <h3 className="text-2xl font-black text-gray-900 mb-4 group-hover:text-indigo-600 transition-colors">
+                <h3 className="text-xs font-black text-gray-800 mb-1 group-hover:text-indigo-600 transition-colors truncate">
                   {subject.name}
                 </h3>
                 
-                <div className="flex flex-wrap gap-3 mb-8">
-                  <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold flex items-center">
-                    <i className="far fa-clock mr-1.5"></i> {subject.settings.timeLimitMinutes} min
+                <div className="flex flex-wrap gap-1 mb-3">
+                  <span className="bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded text-[7px] font-black uppercase flex items-center border border-gray-100">
+                    <i className="far fa-clock mr-0.5"></i> {subject.settings.timeLimitMinutes}m
                   </span>
-                  <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold flex items-center">
-                    <i className="far fa-question-circle mr-1.5"></i> {subject.settings.questionCount} ta savol
+                  <span className="bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded text-[7px] font-black uppercase flex items-center border border-gray-100">
+                    <i className="far fa-question-circle mr-0.5"></i> {subject.settings.questionCount} ta
                   </span>
                 </div>
+              </div>
 
-                <div className="flex items-center text-indigo-600 font-bold group-hover:translate-x-2 transition-transform">
-                  Testni boshlash <i className="fas fa-play-circle ml-2"></i>
-                </div>
+              <div className="flex items-center text-indigo-600 font-black text-[8px] uppercase tracking-widest group-hover:translate-x-0.5 transition-transform">
+                Boshlash <i className="fas fa-chevron-right ml-1 text-[8px]"></i>
               </div>
             </div>
           ))

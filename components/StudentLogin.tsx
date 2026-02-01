@@ -17,40 +17,40 @@ const StudentLogin: React.FC<StudentLoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto py-12">
-      <div className="bg-white p-10 rounded-3xl shadow-2xl border border-gray-100 text-center">
-        <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-indigo-100">
-          <i className="fas fa-user-graduate text-white text-4xl"></i>
+    <div className="max-w-xs mx-auto py-6">
+      <div className="bg-white p-5 rounded-xl shadow-lg border border-gray-100 text-center">
+        <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center mx-auto mb-3 shadow-md">
+          <i className="fas fa-user-graduate text-white text-lg"></i>
         </div>
-        <h2 className="text-3xl font-black text-gray-900 mb-2">Talaba Kirishi</h2>
-        <p className="text-gray-500 mb-8">Testni boshlash uchun ma'lumotlaringizni kiriting</p>
+        <h2 className="text-base font-black text-gray-900 mb-0.5">Kirish</h2>
+        <p className="text-[9px] text-gray-400 mb-5 uppercase font-bold tracking-widest">Ma'lumotlarni to'ldiring</p>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div className="text-left">
-            <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">F.I.O (To'liq ism-sharif)</label>
+            <label className="block text-[8px] font-black text-gray-400 mb-1 ml-0.5 uppercase tracking-wider">Foydalanuvchi</label>
             <div className="relative">
-              <i className="fas fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <i className="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[10px]"></i>
               <input 
                 type="text" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                placeholder="Masalan: Azizov Anvar"
+                className="w-full pl-8 pr-3 py-2 rounded-lg border border-gray-50 bg-gray-50/50 focus:ring-1 focus:ring-indigo-500 outline-none transition-all text-xs font-medium"
+                placeholder="F.I.SH"
                 required
               />
             </div>
           </div>
           
           <div className="text-left">
-            <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">Guruh</label>
+            <label className="block text-[8px] font-black text-gray-400 mb-1 ml-0.5 uppercase tracking-wider">Guruh</label>
             <div className="relative">
-              <i className="fas fa-users absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <i className="fas fa-users absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-[10px]"></i>
               <input 
                 type="text" 
                 value={group}
                 onChange={(e) => setGroup(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                placeholder="Masalan: 201-guruh"
+                className="w-full pl-8 pr-3 py-2 rounded-lg border border-gray-50 bg-gray-50/50 focus:ring-1 focus:ring-indigo-500 outline-none transition-all text-xs font-medium"
+                placeholder="Guruh"
                 required
               />
             </div>
@@ -58,9 +58,9 @@ const StudentLogin: React.FC<StudentLoginProps> = ({ onLogin }) => {
 
           <button 
             type="submit"
-            className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-lg hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-300 transform active:scale-[0.98]"
+            className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-black text-[10px] uppercase tracking-wider hover:bg-indigo-700 transition-all shadow active:scale-[0.98] mt-2"
           >
-            Kirish va Testni Tanlash
+            Davom etish
           </button>
         </form>
       </div>
