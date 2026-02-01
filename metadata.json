@@ -1,0 +1,5 @@
+{
+  "name": "TEST GDPI",
+  "description": "GDPI uchun maxsus ishlab chiqilgan online test tizimi. Word fayldan import qilish va PDF eksport funksiyalari mavjud.",
+  "requestFramePermissions": []
+}
