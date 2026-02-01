@@ -107,10 +107,10 @@ const AdminResults: React.FC<AdminResultsProps> = ({ results, onBack }) => {
           </div>
           <div className="flex items-center space-x-4 text-sm text-gray-500">
             <span className="flex items-center">
-              <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span> Yaxshi (>= 80%)
+              <span className="w-3 h-3 bg-green-500 rounded-full mr-2"></span> Yaxshi (&ge; 80%)
             </span>
             <span className="flex items-center">
-              <span className="w-3 h-3 bg-amber-500 rounded-full mr-2"></span> Qoniqarli (>= 60%)
+              <span className="w-3 h-3 bg-amber-500 rounded-full mr-2"></span> Qoniqarli (&ge; 60%)
             </span>
           </div>
         </div>

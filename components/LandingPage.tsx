@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { AppView } from '../types';
+import { AppView } from '../types.ts';
 
 interface LandingPageProps {
   setView: (view: AppView) => void;
